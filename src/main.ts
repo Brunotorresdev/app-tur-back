@@ -25,15 +25,15 @@ async function bootstrap() {
   );
 
   const config = new DocumentBuilder()
-    .setTitle('Education API')
-    .setDescription('Documentação da API da aplicação de educação')
+    .setTitle('Zarpou API')
+    .setDescription('Documentação da API da aplicação Zarpou')
     .setVersion('1.0')
     .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document, {
-    customSiteTitle: 'Api app tur',
+  SwaggerModule.setup('api/docs', app, document, {
+    customSiteTitle: 'Api Zarpou Docs',
     customCssUrl: 'https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css',
     customJs: [
       'https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js',
