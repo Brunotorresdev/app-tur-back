@@ -4,9 +4,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { UserModule } from './user/user.module';
-import { RoleModule } from './role/role.module';
 import { AuthModule } from './auth/auth.module';
-import { PointsModule } from './points/points.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -16,9 +15,8 @@ import { PointsModule } from './points/points.module';
     }),
     PrismaModule, 
     UserModule, 
-    RoleModule, 
     AuthModule, 
-    PointsModule
+    AdminModule
   ],
   controllers: [AppController],
   providers: [AppService],
