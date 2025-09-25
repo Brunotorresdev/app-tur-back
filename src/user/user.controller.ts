@@ -9,43 +9,4 @@ import { CreateDriverDto } from './dto/create-driver.dto';
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
-
-  //@UseGuards(JwtAuthGuard)
-  @Post()
-  async create(@Body() data: CreateClientDto | CreateDriverDto) {
-    if (![2, 3].includes(data.roleId)) {
-      throw new BadRequestException('Invalid roleId');
-    }
-    return this.userService.create(data);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get()
-  findAll(@Request() req) {
-    return this.userService.findAll();
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get('me')
-  async getMe(@Req() req) {
-    return this.userService.findMe(req.user.id);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Put(':id')
-  update(@Param('id') id: string, @Body() dto: UpdateUserDto) {
-    return this.userService.update(+id, dto);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
-  }
 }
