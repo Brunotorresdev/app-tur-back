@@ -7,11 +7,27 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Bases {
+  id          Int     @id @default(autoincrement())
+  name        String
+  img_url     String?
+  description String?  @db.VarChar(1000)
+  city        String
+  state       String
+
+  users       Users[]
+}
+
 model Users {
   id                    Int     @id @default(autoincrement())    
-  full_name              String  @db.VarChar(255)                 
+  first_name            String? @db.VarChar(255)                 
+  last_name             String? @db.VarChar(255)
+  full_name             String  @db.VarChar(255)
+  birth_date            DateTime?                 
   cpf                   String?  @unique                         
-  rg                    String?  @unique                         
+  rg                    String?  @unique
+  cnh                   String?  @unique
+  cnh_img_url           String?  @unique                          
   phone                 String? @unique                          
   email                 String  @unique                          
   password              String  @db.VarChar(100)
@@ -20,71 +36,23 @@ model Users {
   address_number        String? @db.VarChar(255)
   address_complement    String? @db.VarChar(255)
   address_city          String? @db.VarChar(255)
-  address_state         String? @db.VarChar(255)
-  is_active             Boolean @default(true)                                
-  google_id             String?                                  
-  auth_provider         String?                                  
-  roleId                Int
+  address_state         String? @db.VarChar(2)
+  address_zipcode       String? @db.VarChar(20)
+  is_active             Boolean @default(true)
+  role                  String
   walletId              Int?
-  refreshToken          String?                          
+  refreshToken          String?        
+  base_id               Int?                  
 
-  drivers       Drivers[]
-  trips         Trips[]
-  roles         Roles     @relation(fields: [roleId], references: [id])
+  base          Bases?    @relation(fields: [base_id], references: [id])
   wallet        Wallet?   @relation(fields: [walletId], references: [id])
 
-  @@index([roleId])
-}
-
-model Roles {
-  id          Int     @id @default(autoincrement())
-  name        String
-  description String  @db.VarChar(1000)
-  slug        String  @unique
-
-  users       Users[]
-  permissions RolePermissions[]
-}
-
-model Permissions {
-  id          Int     @id @default(autoincrement())
-  name        String
-  description String  @db.VarChar(1000)
-  slug        String  @unique
-
-  roles       RolePermissions[]
-}
-
-model RolePermissions {
-  id           Int   @id @default(autoincrement())
-  permissionId Int
-  roleId       Int
-
-  role         Roles       @relation(fields: [roleId], references: [id])
-  permission   Permissions @relation(fields: [permissionId], references: [id])
-
-  @@index([roleId])
-  @@index([permissionId])
-}
-
-model Drivers {
-  id                  Int      @id @default(autoincrement())   
-  userId              Int                                      
-  number_cnh          String?  @unique                         
-  img_front_cnh_url   String?  @unique                         
-  img_back_cnh_url    String?  @unique                            
-  status              StatusEnum @default(APPROVED)    
-  operation_hours     Json?   
-
-  users               Users    @relation(fields: [userId], references: [id])
-  trips               Trips[]
-  driver_vehicles     DriverVehicles[]
-  packages            Packages[]
-  @@index([userId])
+  DriverVehicles DriverVehicles[]
 }
 
 model Vehicles {
   id            Int     @id @default(autoincrement())
+  crlv_img_url  String?  @unique
   chassi        String?  @unique
   plate         String?  @unique
   img_plate_url String?
@@ -99,87 +67,53 @@ model Vehicles {
 
 model DriverVehicles {
   id            Int     @id @default(autoincrement())
-  driver_id     Int
+  user_id       Int
   vehicle_id    Int
+  is_active     Boolean @default(true)
 
-  driver        Drivers @relation(fields: [driver_id], references: [id])
+  user          Users    @relation(fields: [user_id], references: [id])
   vehicle       Vehicles @relation(fields: [vehicle_id], references: [id])
 
-  @@index([driver_id])
+  @@index([user_id])
   @@index([vehicle_id])
 }
 
-model Packages {
-  id                   Int     @id @default(autoincrement())
-  driver_id            Int
-  name                 String
-  description          String?  @db.VarChar(1000)
-  point_origin_id      Int
-  point_destination_id Int
-  starting_point       String?
-  duration             Float
-  distance             Float?
-  rate                 Float 
-  amount               Float
-  stops                String[] 
-  is_active            Boolean @default(true)
-  
-  driver               Drivers @relation(fields: [driver_id], references: [id])
-  origin_point         Points @relation("PackageOrigin", fields: [point_origin_id], references: [id])
-  destination_point    Points @relation("PackageDestination", fields: [point_destination_id], references: [id])
-  trips                Trips[]
-
-  @@index([point_origin_id])
-  @@index([point_destination_id])
-  @@index([driver_id])
-}
-
 model Points {
-  id          Int     @id @default(autoincrement())
-  name        String
-  img_url     String?
-  description String?  @db.VarChar(1000)
-  city        String
-  state       String
-  lat         Float
-  long        Float
+  id                    Int     @id @default(autoincrement())
+  name                  String
+  description           String @db.VarChar(1000)
+  address_neighborhood  String @db.VarChar(255)
+  address_street        String @db.VarChar(255)
+  address_number        String @db.VarChar(255)
+  address_complement    String @db.VarChar(255)
+  address_city          String @db.VarChar(255)
+  address_state         String @db.VarChar(255)
+  address_zipcode       String @db.VarChar(20)
+  coverage_radius       Float
+  applied_rate          Float
+  is_gross_value        Boolean
+  is_percentage         Boolean
+  base_value            Float
+  departure_interval    Int?
+  note                  String? @db.VarChar(1000)
+  latitude              Float?
+  longitude             Float?
+  img_url               String?
+  is_active             Boolean @default(true)
 
-  origin_packages      Packages[] @relation("PackageOrigin")
-  destination_packages Packages[] @relation("PackageDestination")
+  PointDestinations PointDestinations[]
 }
 
-model StartingPoints {
+model PointDestinations {
   id          Int     @id @default(autoincrement())
-  name        String
-  img_url     String?
-  description String?  @db.VarChar(1000)
-  city        String
-  state       String
-  lat         Float
-  long        Float
+  point_id    Int
+  destination String  @db.VarChar(255)
+
+  point       Points @relation(fields: [point_id], references: [id])
+
+  @@index([point_id])
 }
 
-model Trips {
-  id          Int     @id @default(autoincrement())
-  client_id   Int
-  driver_id   Int
-  package_id  Int
-  status      StatusTripsEnum @default(PENDING)
-  payment_id  Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  wallet_history WalletHistory[]
-  payments Payments @relation(fields: [payment_id], references: [id])
-  package     Packages @relation(fields: [package_id], references: [id])
-  client      Users    @relation(fields: [client_id], references: [id])
-  driver      Drivers  @relation(fields: [driver_id], references: [id])
-
-  @@index([client_id])
-  @@index([driver_id])
-  @@index([package_id])
-  @@index([payment_id])
-}
 
 model Payments {
   id                Int     @id @default(autoincrement())
@@ -191,7 +125,6 @@ model Payments {
   updatedAt         DateTime @updatedAt
   
   payment_types     PaymentTypes @relation(fields: [payment_types_id], references: [id])
-  trips             Trips[]
 
   @@index([payment_types_id])
 }
@@ -217,14 +150,13 @@ model WalletHistory {
   type        TypeEnum
   amount      Float
   wallet_id   Int
-  trip_id     Int
+  //trip_id     Int
   observation String?  @db.VarChar(1000)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   wallet      Wallet @relation(fields: [wallet_id], references: [id])
-  trip        Trips  @relation(fields: [trip_id], references: [id])
-  @@index([trip_id])
+  //@@index([trip_id])
   @@index([wallet_id])  
 }
 

@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { PrismaModule } from 'src/prisma/prisma.module';
-import { UserValidationService } from './validations/user.validation.service';
+import { UserValidationService } from './helpers/user-validation.helper';
 
 @Module({
   imports: [PrismaModule],
